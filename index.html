@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#102b27">
+<meta name="description" content="مصروفي - دفتر خاص لإدارة مصروف البيت بالليرة السورية">
+<link rel="manifest" href="manifest.webmanifest">
+<title>مصروفي | إدارة مصروف البيت</title>
+<style>
+:root{--bg:#f4f6f3;--card:#fff;--ink:#172b27;--muted:#71817b;--green:#174d40;--mint:#e3f1eb;--line:#e5ebe7;--red:#b84b43;--gold:#c58a35}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif}
+.app{max-width:540px;margin:auto;padding:env(safe-area-inset-top) 16px calc(28px + env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;justify-content:space-between;padding:22px 2px 16px}
+.brand{font-weight:850;font-size:23px;letter-spacing:-.5px}.sub{font-size:12px;color:var(--muted);margin-top:3px}
+.pill{font-size:11px;background:var(--mint);color:var(--green);padding:7px 10px;border-radius:30px;font-weight:700}
+.hero{background:linear-gradient(135deg,#123b32,#1b5b49);color:white;border-radius:22px;padding:20px;box-shadow:0 12px 28px #173e321c}
+.hero small{color:#d2e4dd}.amount{font-size:31px;font-weight:850;margin:8px 0 4px;direction:rtl}.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.stat{background:#ffffff16;border:1px solid #ffffff22;border-radius:14px;padding:11px}.stat b{display:block;font-size:16px;margin-top:5px}
+.progress{height:7px;background:#ffffff30;border-radius:8px;overflow:hidden;margin-top:13px}.progress span{display:block;height:100%;background:#d7e9a5;width:0}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+button,.filebtn{border:0;border-radius:14px;padding:14px 12px;font-size:14px;font-weight:750;cursor:pointer}
+.primary{background:var(--green);color:#fff}.secondary{background:#fff;color:var(--green);border:1px solid var(--line)}
+section{background:var(--card);border:1px solid var(--line);border-radius:19px;padding:16px;margin:13px 0}
+h2{font-size:16px;margin:0 0 13px}.muted{color:var(--muted);font-size:12px}
+form{display:grid;gap:10px}input,select{width:100%;border:1px solid var(--line);border-radius:12px;padding:13px;font:inherit;font-size:14px;background:#fff;color:var(--ink)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+label{font-size:12px;color:var(--muted);display:grid;gap:6px}
+#receipt{font-size:12px}
+.expense{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.expense:last-child{border:0}.expense strong{font-size:14px}.expense small{display:block;color:var(--muted);margin-top:4px}
+.price{font-weight:800;white-space:nowrap}.del{background:#fff0ef;color:var(--red);padding:8px 10px;margin-right:7px}
+.catrow{display:flex;align-items:center;gap:9px;margin:12px 0}.catrow .name{min-width:100px;font-size:13px}.bar{height:8px;background:#edf1ee;border-radius:8px;flex:1;overflow:hidden}.bar i{display:block;height:100%;background:#4f8b75;border-radius:8px}.catrow b{font-size:12px;min-width:70px;text-align:left}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:10px}
+#empty{text-align:center;color:var(--muted);padding:22px 4px;font-size:13px}
+.note{background:#fff8e9;color:#79591e;border-radius:12px;padding:11px;font-size:12px;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div><div class="brand">مصروفي <span style="color:#4f8b75">●</span></div><div class="sub">دفتر مصروف البيت</div></div><div class="pill">خاص على هذا الجهاز</div></header>
+<div class="hero">
+ <small>إجمالي المصروف هذا الشهر</small>
+ <div class="amount" id="spent">٠ ل.س</div>
+ <div class="stats">
+  <div class="stat"><small>الميزانية الشهرية</small><b id="budgetView">٧٠٠٬٠٠٠ ل.س</b></div>
+  <div class="stat"><small>المتبقي</small><b id="remaining">٧٠٠٬٠٠٠ ل.س</b></div>
+ </div>
+ <div class="progress"><span id="progress"></span></div>
+</div>
+<div class="actions">
+ <button class="primary" onclick="document.getElementById('name').focus()">＋ إضافة مصروف</button>
+ <button class="secondary" onclick="document.getElementById('receipt').click()">▧ تصوير فاتورة</button>
+</div>
+<section>
+<h2>تسجيل عملية شراء</h2>
+<form id="expenseForm">
+ <label>اسم المشتريات<input id="name" placeholder="مثلاً: خضار، خبز، منظفات..." required maxlength="80"></label>
+ <div class="row">
+  <label>المبلغ بالليرة السورية<input id="priceInput" type="number" min="1" step="1" placeholder="مثلاً 25000" required inputmode="numeric"></label>
+  <label>التصنيف<select id="category"><option>مواد غذائية</option><option>احتياجات المنزل</option><option>إيجار وفواتير</option><option>مصاريف أخرى</option></select></label>
+ </div>
+ <div class="row">
+  <label>التاريخ<input id="date" type="date" required></label>
+  <label>ملاحظة (اختياري)<input id="memo" maxlength="100" placeholder="اسم المتجر أو تفاصيل"></label>
+ </div>
+ <label>صورة الفاتورة (اختياري)<input id="receipt" type="file" accept="image/*" capture="environment"></label>
+ <div id="photoStatus" class="muted"></div>
+ <button class="primary" type="submit">حفظ المصروف</button>
+</form>
+</section>
+<section>
+ <h2>الميزانية الشهرية</h2>
+ <label>حدد ميزانيتك بالليرة السورية<input id="budgetInput" type="number" min="0" step="1" inputmode="numeric"></label>
+ <button class="secondary" style="width:100%;margin-top:10px" id="saveBudget">حفظ الميزانية</button>
+</section>
+<section>
+ <h2>ملخص حسب التصنيف</h2><div id="categories"></div>
+</section>
+<section>
+ <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0">آخر المصروفات</h2><button class="secondary" style="padding:8px 10px;font-size:12px" id="export">تصدير CSV</button></div>
+ <div id="expenses"><div id="empty">لم تسجل أي مصروف بعد. أضف أول عملية شراء.</div></div>
+</section>
+<div class="note">ملاحظة الخصوصية: هذه النسخة تحفظ السجلات محلياً داخل متصفح هذا الجهاز ولا ترسلها إلى خادم. لا تحفظ صور الفواتير في هذه النسخة التجريبية؛ أرفق الصورة للاطلاع عليها ثم أدخل الإجمالي يدوياً. لا تعتبر هذه النسخة بديلاً عن نسخة احتياطية.</div>
+<footer>مصروفي · بياناتك محلية على هذا الجهاز</footer>
+</div>
+<script>
+const KEY='masroofi_expenses_v1', BKEY='masroofi_budget_v1';
+let expenses=JSON.parse(localStorage.getItem(KEY)||'[]');
+let budget=Number(localStorage.getItem(BKEY)||700000);
+const fmt=n=>new Intl.NumberFormat('ar-SY',{maximumFractionDigits:0}).format(Math.round(n))+' ل.س';
+const today=new Date(); document.getElementById('date').value=today.toISOString().slice(0,10);
+document.getElementById('budgetInput').value=budget;
+function monthItems(){let m=new Date().toISOString().slice(0,7);return expenses.filter(x=>x.date.slice(0,7)===m)}
+function save(){localStorage.setItem(KEY,JSON.stringify(expenses));localStorage.setItem(BKEY,String(budget));render()}
+function render(){
+ const items=monthItems(), total=items.reduce((s,x)=>s+x.amount,0), remain=budget-total;
+ document.getElementById('spent').textContent=fmt(total);
+ document.getElementById('budgetView').textContent=fmt(budget);
+ document.getElementById('remaining').textContent=fmt(remain);
+ document.getElementById('remaining').style.color=remain<0?'#ffd1cb':'white';
+ document.getElementById('progress').style.width=Math.min(100,budget?total/budget*100:0)+'%';
+ const cats=['مواد غذائية','احتياجات المنزل','إيجار وفواتير','مصاريف أخرى'];
+ document.getElementById('categories').innerHTML=cats.map(c=>{let v=items.filter(x=>x.category===c).reduce((s,x)=>s+x.amount,0);return `<div class="catrow"><span class="name">${c}</span><span class="bar"><i style="width:${total?Math.min(100,v/total*100):0}%"></i></span><b>${fmt(v)}</b></div>`}).join('');
+ const sorted=[...expenses].sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+ document.getElementById('expenses').innerHTML=sorted.length?sorted.map(x=>`<div class="expense"><div style="min-width:0"><strong>${esc(x.name)}</strong><small>${esc(x.category)} · ${esc(x.date)}${x.memo?' · '+esc(x.memo):''}</small></div><div style="display:flex;align-items:center"><span class="price">${fmt(x.amount)}</span><button class="del" onclick="removeExpense(${x.id})" aria-label="حذف">×</button></div></div>`).join(''):'<div id="empty">لم تسجل أي مصروف بعد. أضف أول عملية شراء.</div>';
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function removeExpense(id){if(confirm('هل تريد حذف هذا المصروف؟')){expenses=expenses.filter(x=>x.id!==id);save()}}
+document.getElementById('expenseForm').addEventListener('submit',e=>{
+ e.preventDefault();const amount=Number(document.getElementById('priceInput').value);
+ if(!Number.isFinite(amount)||amount<=0)return alert('أدخل مبلغاً صحيحاً');
+ expenses.push({id:Date.now(),name:document.getElementById('name').value.trim(),amount,category:document.getElementById('category').value,date:document.getElementById('date').value,memo:document.getElementById('memo').value.trim()});
+ e.target.reset();document.getElementById('date').value=new Date().toISOString().slice(0,10);document.getElementById('photoStatus').textContent='';save();
+});
+document.getElementById('receipt').addEventListener('change',e=>{document.getElementById('photoStatus').textContent=e.target.files.length?'تم اختيار صورة الفاتورة. أدخل الإجمالي يدوياً في هذه النسخة.':''});
+document.getElementById('saveBudget').onclick=()=>{budget=Math.max(0,Number(document.getElementById('budgetInput').value)||0);save();alert('تم حفظ الميزانية')};
+document.getElementById('export').onclick=()=>{let rows=[['التاريخ','الاسم','التصنيف','المبلغ','ملاحظة'],...expenses.map(x=>[x.date,x.name,x.category,x.amount,x.memo])];let csv='\\ufeff'+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='masroofi-expenses.csv';a.click();URL.revokeObjectURL(a.href)};
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+render();
+</script>
+</body></html>

@@ -1,0 +1,11 @@
+{
+  "name": "مصروفي - إدارة مصروف البيت",
+  "short_name": "مصروفي",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f6f3",
+  "theme_color": "#102b27",
+  "description": "دفتر خاص لإدارة مصروف البيت بالليرة السورية"
+}
